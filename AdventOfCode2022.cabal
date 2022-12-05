@@ -45,6 +45,7 @@ library
   import: shared-properties
   exposed-modules:
     Day1.Main
+    Day2.Main
   build-depends:
     split == 0.2.3.5
   hs-source-dirs: src
