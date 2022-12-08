@@ -74,6 +74,17 @@ part1 = do
     $ sum . map rucksackErrorPriority . lines
     $ input
 
+part2 :: IO ()
+part2 = do
+  putStr "Part One: "
+  input <- readFile "src/Day3/input"
+  print
+    $ sum . map (priority . groupBadge) . groupThrees . lines
+    $ input
+
+groupThrees :: [a] -> [(a, a, a)]
+groupThrees xs = map (\i -> (xs !! i, xs !! (i+1), xs !! (i+2))) $ [0, 3 .. length xs - 1]
+
 test :: IO ()
 test = Test.hspec $ do
   Test.describe "priority" $ do
@@ -94,7 +105,16 @@ test = Test.hspec $ do
       rucksackErrorPriority "vJrwpWtwJgWrhcsFMMfFFhFp" `Test.shouldBe` 16
   Test.describe "groupBadge" $ do
     Test.it "finds badge of a given group of 3 rucksacks" $ do
-      groupBadge ("vJrwpWtwJgWrhcsFMMfFFhFp", "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL","PmmdzqPrVvPwwTWBwg") `Test.shouldBe` 'r'
+      groupBadge
+        ( "vJrwpWtwJgWrhcsFMMfFFhFp"
+        , "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL"
+        , "PmmdzqPrVvPwwTWBwg"
+        ) `Test.shouldBe` 'r'
+      groupBadge
+        ( "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn"
+        , "ttgJtRGJQctTZtZT"
+        , "CrZsJsPPZsGzwwsLwLmpwMDw"
+        ) `Test.shouldBe` 'Z'
 
 priority :: Char -> Int
 priority = (+1) . Maybe.fromMaybe 0 . flip L.elemIndex (['a'..'z'] ++ ['A'..'Z'])
@@ -112,5 +132,8 @@ type Rucksack = [Char]
 rucksackErrorPriority :: Rucksack -> Int
 rucksackErrorPriority = priority . uncurry findCommon . splitEvenly
 
+findCommons :: Eq a => [a] -> [a] -> [a]
+findCommons xs ys = filter (flip elem ys) xs
+
 groupBadge :: (Rucksack, Rucksack, Rucksack) -> Char
-groupBadge (r1, r2, r3) = undefined
+groupBadge (a, b, c) = findCommon a (findCommons b c)
