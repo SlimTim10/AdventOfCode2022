@@ -47,6 +47,7 @@ library
     Day1.Main
     Day2.Main
     Day3.Main
+    Day4.Main
   build-depends:
     split == 0.2.3.5
   hs-source-dirs: src
