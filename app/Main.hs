@@ -11,18 +11,22 @@ main = do
   Day1.test
   Day1.part1
   Day1.part2
+  putStrLn "---"
   
   putStrLn "Day2"
   Day2.test
   Day2.part1
   Day2.part2
+  putStrLn "---"
 
   putStrLn "Day3"
   Day3.test
   Day3.part1
   Day3.part2
+  putStrLn "---"
 
   putStrLn "Day4"
   Day4.test
   Day4.part1
-  -- Day4.part2
+  Day4.part2
+  putStrLn "---"

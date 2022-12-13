@@ -76,7 +76,7 @@ part1 = do
 
 part2 :: IO ()
 part2 = do
-  putStr "Part One: "
+  putStr "Part Two: "
   input <- readFile "src/Day3/input"
   print
     $ sum . map (priority . groupBadge) . groupThrees . lines
