@@ -25,7 +25,8 @@ common shared-properties
   default-language: Haskell2010
   build-depends:
     base ^>=4.14.3.0,
-    hspec == 2.10.6
+    hspec == 2.10.6,
+    containers == 0.6.5.1
 
 executable AdventOfCode2022
   import: shared-properties
@@ -48,6 +49,7 @@ library
     Day2.Main
     Day3.Main
     Day4.Main
+    Day5.Main
   build-depends:
     split == 0.2.3.5
   hs-source-dirs: src
