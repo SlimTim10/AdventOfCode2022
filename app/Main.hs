@@ -35,5 +35,5 @@ main = do
   putStrLn "Day5"
   Day5.test
   Day5.part1
-  -- Day5.part2
+  Day5.part2
   putStrLn "---"

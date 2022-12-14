@@ -47,6 +47,56 @@ Finally, one crate is moved from stack 1 to stack 2:
 The Elves just need to know which crate will end up on top of each stack; in this example, the top crates are C in stack 1, M in stack 2, and Z in stack 3, so you should combine these together and give the Elves the message CMZ.
 
 After the rearrangement procedure completes, what crate ends up on top of each stack?
+
+--- Part Two ---
+
+As you watch the crane operator expertly rearrange the crates, you notice the process isn't following your prediction.
+
+Some mud was covering the writing on the side of the crane, and you quickly wipe it away. The crane isn't a CrateMover 9000 - it's a CrateMover 9001.
+
+The CrateMover 9001 is notable for many new and exciting features: air conditioning, leather seats, an extra cup holder, and the ability to pick up and move multiple crates at once.
+
+Again considering the example above, the crates begin in the same configuration:
+
+    [D]    
+[N] [C]    
+[Z] [M] [P]
+ 1   2   3 
+
+Moving a single crate from stack 2 to stack 1 behaves the same as before:
+
+[D]        
+[N] [C]    
+[Z] [M] [P]
+ 1   2   3 
+
+However, the action of moving three crates from stack 1 to stack 3 means that those three moved crates stay in the same order, resulting in this new configuration:
+
+        [D]
+        [N]
+    [C] [Z]
+    [M] [P]
+ 1   2   3
+
+Next, as both crates are moved from stack 2 to stack 1, they retain their order as well:
+
+        [D]
+        [N]
+[C]     [Z]
+[M]     [P]
+ 1   2   3
+
+Finally, a single crate is still moved from stack 1 to stack 2, but now it's crate C that gets moved:
+
+        [D]
+        [N]
+        [Z]
+[M] [C] [P]
+ 1   2   3
+
+In this example, the CrateMover 9001 has put the crates in a totally different order: MCD.
+
+Before the rearrangement process finishes, update your simulation so that the Elves know where they should stand to be ready to unload the final supplies. After the rearrangement procedure completes, what crate ends up on top of each stack?
 -}
 module Day5.Main where
 
@@ -72,6 +122,22 @@ part1 = do
   where
     f :: Stacks -> String -> Stacks
     f stacks ln = moveCrates n fromKey toKey stacks
+      where (n, fromKey, toKey) = parseMoveLine ln
+
+part2 :: IO ()
+part2 = do
+  putStr "Part Two: "
+  input <- readFile "src/Day5/input"
+  let stacks = parseStacks . takeWhile (not . (" 1" `L.isPrefixOf`)) $ lines input
+  let moves = dropWhile (not . ("move" `L.isPrefixOf`)) $ lines input
+  print
+    $ map (last . snd)
+    . Map.toList
+    . L.foldl' f stacks
+    $ moves
+  where
+    f :: Stacks -> String -> Stacks
+    f stacks ln = moveCrates9001 n fromKey toKey stacks
       where (n, fromKey, toKey) = parseMoveLine ln
 
 test :: IO ()
@@ -134,6 +200,19 @@ test = Test.hspec $ do
             , (9, "RPFLWGZ")
             ]
       parseStacks lines `Test.shouldBe` stacks
+  Test.describe "moveCrates9001" $ do
+    Test.it "moves crates from one stack to another keeping their order" $ do
+      let stacks = Map.fromList
+            [ (1, ['Z', 'N', 'D'])
+            , (2, ['M', 'C'])
+            , (3, ['P'])
+            ]
+      let newStacks = Map.fromList
+            [ (1, [])
+            , (2, ['M', 'C'])
+            , (3, ['P', 'Z', 'N', 'D'])
+            ]
+      moveCrates9001 3 1 3 stacks `Test.shouldBe` newStacks
 
 type Crate = Char
 type Stack = [Crate] -- bottom to top
@@ -147,7 +226,7 @@ push c s = s ++ [c]
 type Stacks = Map.Map Int Stack
 
 moveCrate :: Int -> Int -> Stacks -> Stacks
-moveCrate fromKey toKey stacks = Map.update (Just . const toStack') toKey . Map.update (Just . const fromStack') fromKey $ stacks
+moveCrate fromKey toKey stacks = Map.adjust (const toStack') toKey . Map.adjust (const fromStack') fromKey $ stacks
   where
     fromStack = stacks ! fromKey
     (c, fromStack') = pop fromStack
@@ -162,6 +241,18 @@ moveCrates n fromKey toKey stacks =
   where
     step :: (Stacks, Int) -> (Stacks, Int)
     step (stacks', n') = (moveCrate fromKey toKey stacks', n' - 1)
+
+moveCrates9001 :: Int -> Int -> Int -> Stacks -> Stacks
+moveCrates9001 n fromKey toKey stacks =
+  Map.adjust (const toStack') toKey
+  . Map.adjust (const fromStack') fromKey
+  $ stacks
+  where
+    fromStack = stacks ! fromKey
+    toStack = stacks ! toKey
+    (fromStack', crates) = splitAt (length fromStack - n) fromStack
+    toStack' :: Stack
+    toStack' = toStack ++ crates
 
 parseStacks :: [String] -> Stacks
 parseStacks = L.foldl' step Map.empty . reverse
