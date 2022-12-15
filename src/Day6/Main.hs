@@ -19,6 +19,22 @@ Here are a few more examples:
     zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw: first marker after character 11
 
 How many characters need to be processed before the first start-of-packet marker is detected?
+
+--- Part Two ---
+
+Your device's communication system is correctly detecting packets, but still isn't working. It looks like it also needs to look for messages.
+
+A start-of-message marker is just like a start-of-packet marker, except it consists of 14 distinct characters rather than 4.
+
+Here are the first positions of start-of-message markers for all of the above examples:
+
+    mjqjpqmgbljsphdztnvjfqwrcgsmlb: first marker after character 19
+    bvwbjplbgvbhsrlpgdmjqwftvncz: first marker after character 23
+    nppdvjthqldpwncqszvftbrmjlhg: first marker after character 23
+    nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg: first marker after character 29
+    zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw: first marker after character 26
+
+How many characters need to be processed before the first start-of-message marker is detected?
 -}
 module Day6.Main where
 
@@ -29,19 +45,30 @@ part1 :: IO ()
 part1 = do
   putStr "Part One: "
   input <- readFile "src/Day6/input"
-  print $ findMarkerPosition input
+  print $ findMarkerPosition 4 input
+
+part2 :: IO ()
+part2 = do
+  putStr "Part Two: "
+  input <- readFile "src/Day6/input"
+  print $ findMarkerPosition 14 input
 
 test :: IO ()
 test = Test.hspec $ do
   Test.describe "findMarkerPosition" $ do
     Test.it "finds the position of the first marker" $ do
-      findMarkerPosition "bvwbjplbgvbhsrlpgdmjqwftvncz" `Test.shouldBe` 5
-      findMarkerPosition "nppdvjthqldpwncqszvftbrmjlhg" `Test.shouldBe` 6
-      findMarkerPosition "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg" `Test.shouldBe` 10
-      findMarkerPosition "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw" `Test.shouldBe` 11
+      findMarkerPosition 4 "bvwbjplbgvbhsrlpgdmjqwftvncz" `Test.shouldBe` 5
+      findMarkerPosition 4 "nppdvjthqldpwncqszvftbrmjlhg" `Test.shouldBe` 6
+      findMarkerPosition 4 "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg" `Test.shouldBe` 10
+      findMarkerPosition 4 "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw" `Test.shouldBe` 11
+      findMarkerPosition 14 "mjqjpqmgbljsphdztnvjfqwrcgsmlb" `Test.shouldBe` 19
+      findMarkerPosition 14 "bvwbjplbgvbhsrlpgdmjqwftvncz" `Test.shouldBe` 23
+      findMarkerPosition 14 "nppdvjthqldpwncqszvftbrmjlhg" `Test.shouldBe` 23
+      findMarkerPosition 14 "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg" `Test.shouldBe` 29
+      findMarkerPosition 14 "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw" `Test.shouldBe` 26
 
-findMarkerPosition :: String -> Integer
-findMarkerPosition = fst . head . dropWhile (not . distinct . snd) . zip [4..] . Split.divvy 4 1
+findMarkerPosition :: Int -> String -> Int
+findMarkerPosition n = fst . head . dropWhile (not . distinct . snd) . zip [n..] . Split.divvy n 1
 
 distinct :: Eq a => [a] -> Bool
 distinct [] = True
