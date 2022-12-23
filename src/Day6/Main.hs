@@ -40,6 +40,8 @@ module Day6.Main where
 
 import qualified Test.Hspec as Test
 import qualified Data.List.Split as Split
+import qualified Data.List as L
+import qualified Data.Maybe as Maybe
 
 part1 :: IO ()
 part1 = do
@@ -68,8 +70,7 @@ test = Test.hspec $ do
       findMarkerPosition 14 "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw" `Test.shouldBe` 26
 
 findMarkerPosition :: Int -> String -> Int
-findMarkerPosition n = fst . head . dropWhile (not . distinct . snd) . zip [n..] . Split.divvy n 1
+findMarkerPosition n = (+ n) . Maybe.fromJust . L.findIndex distinct . Split.divvy n 1
 
 distinct :: Eq a => [a] -> Bool
-distinct [] = True
-distinct (x:xs) = x `notElem` xs && distinct xs
+distinct xs = length (L.nub xs) == length xs
